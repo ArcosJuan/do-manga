@@ -1,5 +1,5 @@
 # do-manga
-A script to easily convert MangaKatana downloaded zips into PDFs.
+A script to easily convert [MangaKatana](https://mangakatana.com) downloaded zips into PDFs.
 
 ## Install
 ```sh
