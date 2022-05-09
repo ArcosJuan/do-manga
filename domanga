@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# do-manga
+VERSION="1.0.0"
+
+display_help() {
+    echo "Usage: ${0##*/} [zip-directory] [manga-destination-directory] [unziped-files-directory]" >&2
+    exit 0
+}
+
+
+display_version() {
+    echo "$VERSION" >&2
+    exit 0
+}
+
+
+unzip_and_convert () {
+	name=$1
+	MDEST=$MDIR/$name # Manga files specific destination.
+	TDEST=$TDIR/$name # Unziped files specific destination.
+	
+	echo "Doing $name:"
+
+	if ! [[ -d $TDEST ]]; then mkdir "$TDEST"; fi 
+
+	# Get the .zip files that match with $name.
+	readarray -d '' zip_files < <(find $ZDIR/*.zip -regextype posix-extended -regex $ZDIR/$name$REGEX -print0)
+	
+	[[ ${zip_files[0]} =~ $ZDIR/(.(.+)?)$REGEX ]]
+	first_chapter=${BASH_REMATCH[3]}
+	[[ ${zip_files[-1]} =~ $ZDIR/(.(.+)?)$REGEX ]]
+	final_chapter=${BASH_REMATCH[6]}
+
+	for z in "${zip_files[@]}"; do
+		echo -ne "- Unziping $z\r"
+
+		# Unzips files into TDEST/domanga-trash directory.
+		unzip -o -q "$z" -d $TDEST/domanga-trash
+		
+		if [[ $? == 0 ]]; then
+			echo "- Unziping $z DONE!"
+		else
+			echo "- Unziping $z FAILED!"
+		fi
+
+	done
+	
+	if ! [[ -d $MDEST ]]; then mkdir "$MDEST"; fi
+
+	pdf_name=$MDEST/$name"_c"$first_chapter"c"$final_chapter
+
+	echo -ne "- Creating $name"_c"$first_chapter"c"$final_chapter in $MDEST ...\r"
+
+	# Converts the .jpg files into TDIR directory to a pdf.
+	convert $(find $TDEST -type f -iname \*.jpg | sort) "$pdf_name".pdf; 
+
+	if [[ $? == 0 ]]; then
+		echo "- Creating $name"_c"$first_chapter"c"$final_chapter in $MDEST DONE!"
+	else
+		echo "- Creating $name"_c"$first_chapter"c"$final_chapter in $MDEST FAILED!"
+	fi
+}
+
+case $1 in
+	-h|--help)
+		display_help ;;
+	-v|--version)
+		display_version ;;
+esac
+
+
+ZDIR=${1:-"."} # Zip files directory
+MDIR=${2:-"."} # Manga files directory.
+TDIR=${3:-"."} # Uziped files directory.
+
+# Uses a regex to determine with files are MangaKatana zips.	
+REGEX="_c([[:digit:]]+((\.[[:digit:]]+)+)?)[[:space:]]_[[:space:]]c([[:digit:]]+((\.[[:digit:]]+)+)?)\.zip$"	
+
+uziped_files=()
+for z in sort $ZDIR/*.zip; do
+	if [[ $z =~ $ZDIR/(.(.+)?)$REGEX ]]; then
+		file_name=${BASH_REMATCH[1]}
+		
+		if [[ ! ${uziped_files[@]} =~ $file_name ]]; then
+			uziped_files+=($file_name)
+			unzip_and_convert $file_name
+		fi
+	fi
+done
+
+if [[ ${#uziped_files[0]} == 0 ]]; then
+	echo "Sorry, no manga to do."
+	display_help
+fi
+
+exit 0

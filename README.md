@@ -1,13 +1,13 @@
 # do-manga
-A script to easily convert MangaKatana downloaded zips into PDFs. This is my first time programming in shell, so it's far from perfect.
+A script to easily convert MangaKatana downloaded zips into PDFs.
 
-## Instructions for use
-First you need to have your zip files that contains many folders with images, stored in different folders (The folder name doesn't matter).
+## Install
+```sh
+sudo curl -sL github.com/ArcosJuan/do-manga/raw/main/domanga -o /usr/local/bin/domanga &&
+sudo chmod +x /usr/local/bin/domanga
+```
 
-![image](https://user-images.githubusercontent.com/87381835/160305632-63045706-cc0f-4b9f-8012-12920c45511f.png)
-
-Then, from outside the folder, execute the command. After unzip the files, a message will appear, so you write the name of the pdf.
-
-![image](https://user-images.githubusercontent.com/87381835/160305825-2501ccd1-a0a4-4b83-9d1b-5fc1445fabd5.png)
-
-The "Zips in folder..." text is a help to read the name of what you are converting to pdf. Once you have written the name, the pdf will be created.
+## Usage
+```sh
+domanga [zip-directory] [manga-destination-directory] [unziped-files-directory]
+```
