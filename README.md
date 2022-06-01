@@ -11,3 +11,6 @@ sudo chmod +x /usr/local/bin/domanga
 ```sh
 domanga [zip-directory] [manga-destination-directory] [unziped-files-directory]
 ```
+
+## Dependencies
+- img2pdf
