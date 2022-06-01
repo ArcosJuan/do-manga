@@ -53,7 +53,7 @@ unzip_and_convert () {
 	echo -ne "- Creating $name"_c"$first_chapter"c"$final_chapter in $MDEST ...\r"
 
 	# Converts the .jpg files into TDIR directory to a pdf.
-	convert -define pdf:author="" -define pdf:producer="" $(find $TDEST -type f -iname \*.jpg | sort) "$pdf_name".pdf; 
+	img2pdf --output "$pdf_name".pdf $(find $TDEST -type f -iname \*.jpg | sort) &> /dev/null 
 
 	if [[ $? == 0 ]]; then
 		echo "- Creating $name"_c"$first_chapter"c"$final_chapter in $MDEST DONE!"
